@@ -11,6 +11,7 @@ from app.services.repositories.amenity_repository import AmenityRepository
 class HBnBFacade:
     """Class for facade methods"""
     def __init__(self):
+        
         self.user_repo = UserRepository()
         self.place_repo = PlaceRepository()
         self.review_repo = ReviewRepository()

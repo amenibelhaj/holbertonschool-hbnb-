@@ -1,7 +1,10 @@
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import get_jwt, jwt_required, get_jwt_identity
+from app.services.facade import HBnBFacade
 from app.services import facade
 from flask import request
+
+facade = HBnBFacade()
 
 api = Namespace('amenities', description='Amenity operations')
 

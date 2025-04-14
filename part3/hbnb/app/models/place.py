@@ -1,10 +1,10 @@
+# app/models/place.py
 """
-this module contain a class Place
+This module contains a class Place
 """
 from .base_model import BaseModel
 from app import db
 from app.models.association_tables import place_amenity_association
-
 
 class Place(BaseModel):
     """Represents a place that can be rented in the HbnB app"""
@@ -17,6 +17,11 @@ class Place(BaseModel):
     longitude = db.Column(db.Float, nullable=False)
     user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
     review_list = db.relationship('Review', backref='reviewed_place', lazy=True)
+    
+    # One-to-many relationship with Review
+    review_list = db.relationship('Review', backref='reviewed_place', lazy=True)
+
+    # Many-to-many relationship with Amenity
     associated_amenities = db.relationship('Amenity', secondary=place_amenity_association, backref='places_associated')
 
     def __init__(self, title, description, price, latitude, longitude):
@@ -29,7 +34,7 @@ class Place(BaseModel):
         self.validate_place()
 
     def validate_place(self):
-        """Validate place informations format"""
+        """Validate place information format"""
         if not self.title:
             raise ValueError("Title is required")
         if (not self.price) or self.price <= 0:
@@ -39,15 +44,18 @@ class Place(BaseModel):
         if (not self.longitude) or self.longitude < -180 or self.longitude > 180:
             raise ValueError("Longitude must be between -180 and 180")
 
-
+    # Add a review to the place
     def add_review(self, review):
         """Add a review to the place."""
         self.reviews.append(review)
 
+    # Add an amenity to the place (this will associate the amenity with the place)
     def add_amenity(self, amenity):
         """Add an amenity to the place."""
-        self.amenities.append(amenity)
+        self.associated_amenities.append(amenity)
+        db.session.commit()  # Ensure the changes are committed to the database
 
+    # Returns the place information as a dictionary
     def list_by_place(self):
         """Dictionary of details for place."""
         place_info = {
